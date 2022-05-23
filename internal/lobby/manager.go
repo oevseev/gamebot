@@ -1,31 +1,54 @@
 package lobby
 
-import "fmt"
+import (
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/google/uuid"
+)
 
 type Manager struct {
-	Lobbies map[LobbyID]*Lobby
+	store *Store
 }
 
-func NewManager() Manager {
-	return Manager{
-		Lobbies: make(map[LobbyID]*Lobby),
+func NewManager(store *Store) *Manager {
+	return &Manager{
+		store: store,
 	}
 }
 
-func (m *Manager) CreateLobby() *Lobby {
-	lobby := NewLobby()
-	m.Lobbies[lobby.ID] = lobby
-	return lobby
-}
-
-func (m *Manager) GetLobby(id LobbyID) (*Lobby, error) {
-	lobby, ok := m.Lobbies[id]
-	if !ok {
-		return nil, fmt.Errorf("lobby %s not found", id)
+func (m *Manager) CreateLobby() (*Lobby, error) {
+	lobby := &Lobby{
+		ID:      LobbyID(uuid.New()),
+		Members: map[int]tgbotapi.User{},
+		manager: m,
+	}
+	err := m.store.Insert(lobby)
+	if err != nil {
+		return nil, err
 	}
 	return lobby, nil
 }
 
-func (m *Manager) DeleteLobby(id LobbyID) {
-	delete(m.Lobbies, id)
+func (m *Manager) GetLobby(id LobbyID) (*Lobby, error) {
+	lobby, err := m.store.Find(id)
+	if err != nil {
+		return nil, err
+	}
+	lobby.manager = m
+	return lobby, nil
+}
+
+func (m *Manager) DeleteLobby(id LobbyID) error {
+	err := m.store.Delete(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) UpdateLobby(lobby *Lobby) error {
+	err := m.store.Update(lobby)
+	if err != nil {
+		return err
+	}
+	return nil
 }

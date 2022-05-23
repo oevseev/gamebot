@@ -10,19 +10,15 @@ type LobbyID uuid.UUID
 type Lobby struct {
 	ID      LobbyID
 	Members map[int]tgbotapi.User
-}
-
-func NewLobby() *Lobby {
-	return &Lobby{
-		ID:      LobbyID(uuid.New()),
-		Members: make(map[int]tgbotapi.User),
-	}
+	manager *Manager
 }
 
 func (l *Lobby) Join(user tgbotapi.User) {
 	l.Members[user.ID] = user
+	l.manager.UpdateLobby(l)
 }
 
 func (l *Lobby) Leave(userId int) {
 	delete(l.Members, userId)
+	l.manager.UpdateLobby(l)
 }
