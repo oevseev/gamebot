@@ -45,7 +45,7 @@ func (m *Manager) DeleteLobby(id LobbyID) error {
 	return nil
 }
 
-func (m *Manager) UpdateLobby(lobby *Lobby) error {
+func (m *Manager) updateLobby(lobby *Lobby) error {
 	err := m.store.Update(lobby)
 	if err != nil {
 		return err
