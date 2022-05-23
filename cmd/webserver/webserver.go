@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,11 @@ import (
 
 func main() {
 	r := gin.Default()
+
+	r.GET("/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		c.String(http.StatusOK, id)
+	})
 
 	r.RunTLS(
 		os.Getenv("LISTEN_ADDR"),
