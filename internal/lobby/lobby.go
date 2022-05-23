@@ -1,7 +1,6 @@
 package lobby
 
 import (
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/google/uuid"
 )
 
@@ -9,12 +8,12 @@ type LobbyID uuid.UUID
 
 type Lobby struct {
 	ID      LobbyID
-	Members map[int]tgbotapi.User
+	Members map[int]struct{}
 	manager *Manager
 }
 
-func (l *Lobby) Join(user tgbotapi.User) {
-	l.Members[user.ID] = user
+func (l *Lobby) Join(userId int) {
+	l.Members[userId] = struct{}{}
 	l.manager.updateLobby(l)
 }
 

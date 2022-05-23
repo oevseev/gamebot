@@ -1,7 +1,6 @@
 package lobby
 
 import (
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/google/uuid"
 )
 
@@ -18,7 +17,7 @@ func NewManager(store *Store) *Manager {
 func (m *Manager) CreateLobby() (*Lobby, error) {
 	lobby := &Lobby{
 		ID:      LobbyID(uuid.New()),
-		Members: map[int]tgbotapi.User{},
+		Members: map[int]struct{}{},
 		manager: m,
 	}
 	err := m.store.Insert(lobby)
