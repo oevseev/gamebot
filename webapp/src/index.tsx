@@ -1,7 +1,10 @@
 /// <reference types="telegram-web-app" />
 
+import "./style.css";
+
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
+import interact from "interactjs";
 
 const content = <div>
     <h1>Welcome to the web app, {window.Telegram.WebApp.initDataUnsafe.user.username}!</h1>
