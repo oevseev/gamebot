@@ -12,15 +12,17 @@ import (
 type Bot struct {
 	api          *tgbotapi.BotAPI
 	lobbyManager *lobby.Manager
+	webappUrl    string
 }
 
-func NewBot(api *tgbotapi.BotAPI, mongoClient *mongo.Client) *Bot {
+func NewBot(api *tgbotapi.BotAPI, mongoClient *mongo.Client, webappUrl string) *Bot {
 	store := lobby.NewStore(mongoClient)
 	manager := lobby.NewManager(store)
 
 	return &Bot{
 		api:          api,
 		lobbyManager: manager,
+		webappUrl:    webappUrl,
 	}
 }
 
@@ -33,7 +35,7 @@ func (b *Bot) handleDeepLinkedStart(update *tgbotapi.Update) {
 			tgbotapi.InlineKeyboardButton{
 				Text: "Join",
 				WebApp: &tgbotapi.WebAppInfo{
-					URL: fmt.Sprintf("https://127.0.0.1:8080/%s", payload),
+					URL: fmt.Sprintf("%s/%s", b.webappUrl, payload),
 				},
 			}))
 
@@ -73,6 +75,19 @@ func (b *Bot) handleCreate(update *tgbotapi.Update) {
 }
 
 func (b *Bot) Run() error {
+	_, err := b.api.Request(tgbotapi.SetChatMenuButtonConfig{
+		MenuButton: &tgbotapi.MenuButton{
+			Type: "web_app",
+			Text: "Main Menu",
+			WebApp: &tgbotapi.WebAppInfo{
+				URL: b.webappUrl,
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 	updates := b.api.GetUpdatesChan(u)

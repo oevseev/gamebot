@@ -23,6 +23,11 @@ func main() {
 		log.Panic("MONGO_ENDPOINT not set")
 	}
 
+	webappUrl, ok := os.LookupEnv("WEBAPP_URL")
+	if !ok {
+		log.Panic("WEBAPP_URL not set")
+	}
+
 	api, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Panic(err)
@@ -37,7 +42,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	b := bot.NewBot(api, mongoClient)
+	b := bot.NewBot(api, mongoClient, webappUrl)
 	if err := b.Run(); err != nil {
 		log.Panic(err)
 	}
