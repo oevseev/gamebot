@@ -1,12 +1,13 @@
 {
   "devDependencies": {
+    "@dnd-kit/core": "^6.0.3",
     "@interactjs/types": "^1.10.11",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.5",
     "@types/telegram-web-app": "^1.0.0",
     "autoprefixer": "^10.4.7",
     "css-loader": "^6.7.1",
-    "interactjs": "^1.10.11",
+    "framer-motion": "^6.3.10",
     "postcss": "^8.4.14",
     "postcss-loader": "^7.0.0",
     "react": "^18.1.0",
