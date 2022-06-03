@@ -48,23 +48,21 @@ class PreferansView extends React.Component<{}, {}> {
 }
 
 interact(".card-deck").dropzone({
-    listeners: {
-        ondragenter (event: InteractEvent) {
-            var target = event.target;
-            var relatedTarget = event.relatedTarget;
-            relatedTarget.setAttribute("drag-target", target.id);
-        },
-        ondragleave (event: InteractEvent) {
-            var relatedTarget = event.relatedTarget;
-            relatedTarget.removeAttribute("drag-target");
-        },
-        ondrop (event: InteractEvent) {
-            console.log("ondrop");
-        },
-        ondropdeactivate (event: InteractEvent) {
-            var relatedTarget = event.relatedTarget;
-            relatedTarget.removeAttribute("drag-target");
-        }
+    ondragenter (event: InteractEvent) {
+        var target = event.target;
+        var relatedTarget = event.relatedTarget;
+        relatedTarget.setAttribute("drag-target", target.id);
+    },
+    ondragleave (event: InteractEvent) {
+        var relatedTarget = event.relatedTarget;
+        relatedTarget.removeAttribute("drag-target");
+    },
+    ondrop (event: InteractEvent) {
+        console.log("ondrop");
+    },
+    ondropdeactivate (event: InteractEvent) {
+        var relatedTarget = event.relatedTarget;
+        relatedTarget.removeAttribute("drag-target");
     }
 });
   
