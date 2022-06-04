@@ -2,7 +2,6 @@
   "devDependencies": {
     "@dnd-kit/core": "^6.0.3",
     "@headlessui/react": "^1.6.4",
-    "@interactjs/types": "^1.10.11",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.5",
     "@types/telegram-web-app": "^1.0.0",
