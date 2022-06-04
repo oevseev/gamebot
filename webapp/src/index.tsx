@@ -4,8 +4,8 @@ import "./style.css";
 
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import {DndContext, DragEndEvent, useDraggable, useDroppable} from '@dnd-kit/core'
-import {CSS} from '@dnd-kit/utilities';
+import {DndContext, DragEndEvent, useDraggable, useDroppable} from "@dnd-kit/core"
+import {CSS} from "@dnd-kit/utilities";
 
 type CardID = string | number;
 type DeckID = string | number;
@@ -75,6 +75,9 @@ class PreferansView extends React.Component<PreferansViewProps, {}> {
 }
 
 interface AppConfig {
+    webSocketUrl: string;
+    gameId: string;
+    playerId: string | undefined | null;
 }
 
 interface AppState {
@@ -82,20 +85,30 @@ interface AppState {
 }
 
 class App extends React.Component<{config: AppConfig}, AppState> {
+    ws: WebSocket;
     handlers: PreferansViewHandlers;
 
     constructor(props: {config: AppConfig}) {
         super(props);
+
         this.state = {
             gameState: {}
         };
+
+        this.ws = new WebSocket(this.props.config.webSocketUrl);
+        this.ws.addEventListener("open", this.openConnection.bind(this));
+
         this.handlers = {
             moveCard: this.moveCard.bind(this)
         };
     }
 
+    openConnection(e: Event) {
+        this.ws.send(JSON.stringify(this.props.config));
+    }
+
     moveCard(cardId: CardID, deckId: DeckID) {
-        console.log(cardId, deckId);
+        this.ws.send(JSON.stringify({cardId: cardId, deckId: deckId}));
     }
 
     render(): JSX.Element {
@@ -103,7 +116,16 @@ class App extends React.Component<{config: AppConfig}, AppState> {
     }
 }
 
-const appConfig = {};
+declare global {
+    interface Window { appConfig: AppConfig; }
+}
+
+var content = <div className="p-4">
+    <p>Please visit this page via Telegram.</p>
+</div>;
+if (window.appConfig.playerId != null) {
+    content = <App config={window.appConfig}/>;
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App config={appConfig}/>);
+root.render(content);

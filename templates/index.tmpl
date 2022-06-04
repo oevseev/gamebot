@@ -8,6 +8,13 @@
     </head>
     <body>
         <div id="root"></div>
-        <script src="bundle.js"></script>
+        <script>
+            window.appConfig = {
+                webSocketUrl: {{ .webSocketUrl }},
+                gameId: {{ .gameId }},
+                playerId: window.Telegram.WebApp.initDataUnsafe.user.id
+            };
+        </script>
+        <script src="/static/bundle.js"></script>
     </body>
 </html>
