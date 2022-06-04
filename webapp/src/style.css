@@ -20,3 +20,8 @@ button {
     background-color: var(--tg-theme-button-color);
     color: var(--tg-theme-button-text-color);
 }
+
+.preferans-view {
+    background: rgb(0,70,0);
+    background: linear-gradient(0deg, rgb(25, 70, 25) 0%, rgba(50,100,50,1) 100%);
+}
