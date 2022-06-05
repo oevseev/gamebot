@@ -1,8 +1,10 @@
 import * as React from "react";
-import PreferansView, { CardID, DeckID, PreferansState, PreferansViewHandlers } from "./games/preferans";
+
+import PreferansView, { CardID, DeckID, PreferansConfig, PreferansState, PreferansViewHandlers } from "./games/preferans";
 
 interface AppState {
-    gameState: PreferansState;
+    gameConfig: PreferansConfig | undefined | null;
+    gameState: PreferansState | undefined | null;
 }
 
 interface Message {
@@ -24,7 +26,8 @@ class App extends React.Component<{config: AppConfig}, AppState> {
         super(props);
 
         this.state = {
-            gameState: {}
+            gameConfig: null,
+            gameState: null
         };
 
         this.ws = new WebSocket(this.props.config.webSocketUrl);
@@ -67,11 +70,15 @@ class App extends React.Component<{config: AppConfig}, AppState> {
         switch (message.messageType) {
         case "joinedAsPlayer":
             this.onJoinedAsPlayer(message.payload);
+            break;
         }
     }
 
-    onJoinedAsPlayer(preferansState: PreferansState) {
-        console.log(preferansState);
+    onJoinedAsPlayer({preferansConfig, preferansState}: {preferansConfig: PreferansConfig, preferansState: PreferansState}) {
+        this.setState({
+            gameConfig: preferansConfig,
+            gameState: preferansState
+        });
     }
 
     moveCard(cardId: CardID, deckId: DeckID) {
