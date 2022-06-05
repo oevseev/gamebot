@@ -5,6 +5,11 @@ interface AppState {
     gameState: PreferansState;
 }
 
+interface Message {
+    messageType: string;
+    payload: any;
+}
+
 export interface AppConfig {
     webSocketUrl: string;
     gameId: string;
@@ -52,12 +57,21 @@ class App extends React.Component<{config: AppConfig}, AppState> {
     }
 
     onMessage(e: MessageEvent) {
-        var message = JSON.parse(e.data);
+        var message: Message = JSON.parse(e.data);
 
-        if (message.messageType == "joinedAsPlayer") {
+        if (message.messageType == "joinedAsSpectator") {
             window.Telegram.WebApp.close();
-            return
-        }   
+            return;
+        }
+
+        switch (message.messageType) {
+        case "joinedAsPlayer":
+            this.onJoinedAsPlayer(message.payload);
+        }
+    }
+
+    onJoinedAsPlayer(preferansState: PreferansState) {
+        console.log(preferansState);
     }
 
     moveCard(cardId: CardID, deckId: DeckID) {

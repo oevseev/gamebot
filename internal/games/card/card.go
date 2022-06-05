@@ -1,5 +1,13 @@
 package card
 
+import (
+	"errors"
+	"fmt"
+	"strconv"
+	"strings"
+	"unicode/utf8"
+)
+
 type Rank int
 
 const (
@@ -32,4 +40,30 @@ const (
 type Card struct {
 	Rank Rank
 	Suit Suit
+}
+
+func (c Card) MarshalText() (text []byte, err error) {
+	return []byte(fmt.Sprintf("%d,%d", c.Rank, c.Suit)), nil
+}
+
+func (c *Card) UnmarshalText(text []byte) error {
+	if !utf8.Valid(text) {
+		return errors.New("text is not valid UTF-8")
+	}
+	s := string(text)
+
+	substrings := strings.SplitN(s, ",", 2)
+	rank, err := strconv.ParseInt(substrings[0], 10, 32)
+	if err != nil {
+		return err
+	}
+	suit, err := strconv.ParseInt(substrings[0], 10, 32)
+	if err != nil {
+		return err
+	}
+
+	c.Rank = Rank(rank)
+	c.Suit = Suit(suit)
+
+	return nil
 }

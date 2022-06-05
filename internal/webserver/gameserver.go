@@ -99,19 +99,24 @@ func (g *GameServer) handleAuthorize(ws *websocket.Conn, gameId lobby.ID, player
 
 	autorizeMutex.Unlock()
 
+	game, ok := g.games[gameId]
+	if !ok {
+		game = preferans.NewGame(playerId)
+		g.games[gameId] = game
+	}
+
 	var message Message
 	if isMember {
 		message = Message{
 			MessageType: "joinedAsPlayer",
 			Payload: map[string]interface{}{
-				"preferansConfig": g.games[gameId].Config,
-				"preferansState":  g.games[gameId].GetPublicState(playerId),
+				"preferansConfig": game.Config,
+				"preferansState":  game.GetPublicState(playerId),
 			},
 		}
 	} else {
 		message = Message{
 			MessageType: "joinedAsSpectator",
-			Payload:     map[string]interface{}{},
 		}
 	}
 	payload, err := json.Marshal(message)
