@@ -5,7 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
+	"github.com/oevseev/gamebot/internal/lobby"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var upgrader = websocket.Upgrader{
@@ -17,12 +20,23 @@ var upgrader = websocket.Upgrader{
 }
 
 type WebServer struct {
-	r *gin.Engine
+	r            *gin.Engine
+	lobbyManager *lobby.Manager
+	gameServer   *GameServer
 }
 
-func NewWebServer(fqdn string) *WebServer {
+func NewWebServer(fqdn string, mongoClient *mongo.Client) *WebServer {
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*.tmpl")
+
+	store := lobby.NewStore(mongoClient)
+	manager := lobby.NewManager(store)
+
+	w := &WebServer{
+		r:            r,
+		lobbyManager: manager,
+		gameServer:   NewGameServer(manager),
+	}
 
 	r.GET("/ws", func(c *gin.Context) {
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -31,27 +45,26 @@ func NewWebServer(fqdn string) *WebServer {
 			return
 		}
 		defer ws.Close()
-		for {
-			mt, message, err := ws.ReadMessage()
-			if err != nil {
-				fmt.Println(err)
-				break
-			}
-			if mt != websocket.TextMessage {
-				continue
-			}
-			fmt.Println(string(message))
-		}
+		w.gameServer.HandleConnection(ws)
 	})
 
 	r.GET("/:id", func(c *gin.Context) {
+		uuid, err := uuid.FromBytes([]byte(c.Param("id")))
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
+		lobbyId := lobby.ID(uuid)
+		if _, err := w.lobbyManager.GetLobby(lobbyId); err != nil {
+			c.AbortWithError(http.StatusNotFound, err)
+			return
+		}
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"webSocketUrl": fmt.Sprintf("wss://%s/ws", fqdn),
 			"gameId":       c.Param("id"),
 		})
 	})
 
-	return &WebServer{r: r}
+	return w
 }
 
 func (w *WebServer) RunTLS(listenAddr string, tlsCertPath string, tlsKeyPath string) error {
