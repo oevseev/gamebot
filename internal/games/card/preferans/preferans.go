@@ -59,18 +59,18 @@ type Score struct {
 	Whist map[int]map[int]int
 }
 
-type PreferansDeal struct {
+type Deal struct {
 	Dealer  int
 	Bidding Bidding
 	State   State
 	Score   Score
 }
 
-type PreferansConfig struct {
+type Config struct {
 	PoolLimit int
 }
 
-type PreferansGame struct {
-	Config PreferansConfig
-	Deals  []PreferansDeal
+type Game struct {
+	Config Config
+	Deals  []Deal
 }
