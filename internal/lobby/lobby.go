@@ -4,10 +4,10 @@ import (
 	"github.com/google/uuid"
 )
 
-type LobbyID uuid.UUID
+type ID uuid.UUID
 
 type Lobby struct {
-	ID      LobbyID
+	ID      ID
 	Members map[int]struct{}
 	manager *Manager
 }

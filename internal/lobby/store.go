@@ -37,7 +37,7 @@ func (s *Store) Insert(lobby *Lobby) error {
 	return nil
 }
 
-func (s *Store) Find(id LobbyID) (*Lobby, error) {
+func (s *Store) Find(id ID) (*Lobby, error) {
 	lobbies := s.client.Database("gamebot").Collection("lobbies")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -71,7 +71,7 @@ func (s *Store) Update(lobby *Lobby) error {
 	return nil
 }
 
-func (s *Store) Delete(id LobbyID) error {
+func (s *Store) Delete(id ID) error {
 	lobbies := s.client.Database("gamebot").Collection("lobbies")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

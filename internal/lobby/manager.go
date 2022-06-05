@@ -16,7 +16,7 @@ func NewManager(store *Store) *Manager {
 
 func (m *Manager) CreateLobby() (*Lobby, error) {
 	lobby := &Lobby{
-		ID:      LobbyID(uuid.New()),
+		ID:      ID(uuid.New()),
 		Members: map[int]struct{}{},
 		manager: m,
 	}
@@ -27,7 +27,7 @@ func (m *Manager) CreateLobby() (*Lobby, error) {
 	return lobby, nil
 }
 
-func (m *Manager) GetLobby(id LobbyID) (*Lobby, error) {
+func (m *Manager) GetLobby(id ID) (*Lobby, error) {
 	lobby, err := m.store.Find(id)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (m *Manager) GetLobby(id LobbyID) (*Lobby, error) {
 	return lobby, nil
 }
 
-func (m *Manager) DeleteLobby(id LobbyID) error {
+func (m *Manager) DeleteLobby(id ID) error {
 	err := m.store.Delete(id)
 	if err != nil {
 		return err
