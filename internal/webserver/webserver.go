@@ -1,12 +1,11 @@
 package webserver
 
 import (
-	"encoding/hex"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/oevseev/gamebot/internal/lobby"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -51,7 +50,7 @@ func NewWebServer(fqdn string, mongoClient *mongo.Client) *WebServer {
 	r.GET("/ws", func(c *gin.Context) {
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 		defer ws.Close()
@@ -59,17 +58,12 @@ func NewWebServer(fqdn string, mongoClient *mongo.Client) *WebServer {
 	})
 
 	r.GET("/:id", func(c *gin.Context) {
-		hex, err := hex.DecodeString(c.Param("id"))
+		lobbyId, err := lobby.IDFromString(c.Param("id"))
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		uuid, err := uuid.FromBytes(hex)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		if _, err := w.lobbyManager.GetLobby(lobby.ID(uuid)); err != nil {
+		if _, err := w.lobbyManager.GetLobby(lobbyId); err != nil {
 			c.AbortWithError(http.StatusNotFound, err)
 			return
 		}

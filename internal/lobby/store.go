@@ -63,7 +63,7 @@ func (s *Store) Update(lobby *Lobby) error {
 		return err
 	}
 
-	_, err = lobbies.UpdateOne(ctx, bson.M{"id": lobby.ID}, doc)
+	_, err = lobbies.ReplaceOne(ctx, bson.M{"id": lobby.ID}, doc)
 	if err != nil {
 		return err
 	}

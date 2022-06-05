@@ -23,15 +23,41 @@ class App extends React.Component<{config: AppConfig}, AppState> {
         };
 
         this.ws = new WebSocket(this.props.config.webSocketUrl);
-        this.ws.addEventListener("open", this.openConnection.bind(this));
+        this.ws.addEventListener("open", this.onOpenConnection.bind(this));
+        this.ws.addEventListener("close", this.onCloseConnection.bind(this));
+        this.ws.addEventListener("error", this.onError.bind(this));
+        this.ws.addEventListener("message", this.onMessage.bind(this));
 
         this.handlers = {
             moveCard: this.moveCard.bind(this)
         };
     }
 
-    openConnection(e: Event) {
-        this.ws.send(JSON.stringify(this.props.config));
+    onOpenConnection(e: Event) {
+        this.ws.send(JSON.stringify({
+            "messageType": "authorize",
+            "payload": {
+                "gameId": this.props.config.gameId,
+                "playerId": this.props.config.playerId
+            }
+        }));
+    }
+
+    onCloseConnection(e: CloseEvent) {
+        window.Telegram.WebApp.close();
+    }
+
+    onError(e: Event) {
+        window.Telegram.WebApp.close();
+    }
+
+    onMessage(e: MessageEvent) {
+        var message = JSON.parse(e.data);
+
+        if (message.messageType == "joinedAsPlayer") {
+            window.Telegram.WebApp.close();
+            return
+        }   
     }
 
     moveCard(cardId: CardID, deckId: DeckID) {

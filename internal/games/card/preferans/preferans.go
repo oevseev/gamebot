@@ -5,7 +5,7 @@ import "github.com/oevseev/gamebot/internal/games/card"
 type CardStatus int
 
 const (
-	NOT_DEALT       = CardStatus(iota)
+	STATUS_UNKNOWN  = CardStatus(iota)
 	IN_TALON_FIRST  = CardStatus(iota)
 	IN_TALON_SECOND = CardStatus(iota)
 	IN_HAND         = CardStatus(iota)
@@ -23,14 +23,14 @@ const (
 	WHIST_RETURNED = CardStatus(iota)
 )
 
-type State struct {
+type Table struct {
 	LeadSuit      card.Suit
 	CurrentPlayer int
 	Owner         map[card.Card]int
 	Status        map[card.Card]CardStatus
 }
 
-type PublicState struct {
+type PublicTable struct {
 	LeadSuit       card.Suit
 	CurrentPlayer  int
 	CardsRemaining map[int]int
@@ -62,15 +62,64 @@ type Score struct {
 type Deal struct {
 	Dealer  int
 	Bidding Bidding
-	State   State
+	Table   Table
 	Score   Score
 }
 
+type PublicState struct {
+	Dealer  int
+	Bidding Bidding
+	Table   PublicTable
+	Pool    []Score
+}
+
 type Config struct {
-	PoolLimit int
+	PoolLimit   int
+	PlayerOrder map[int64]int
 }
 
 type Game struct {
 	Config Config
-	Deals  []Deal
+	deals  []Deal
+}
+
+func (g *Game) GetPublicState(playerId int64) PublicState {
+	currentDeal := g.deals[len(g.deals)-1]
+	selectedPlayerIdx := g.Config.PlayerOrder[playerId]
+
+	pool := make([]Score, 0, len(g.deals))
+	for _, deal := range g.deals {
+		pool = append(pool, deal.Score)
+	}
+
+	cardsRemaining := make(map[int]int)
+	for _, ownerIdx := range currentDeal.Table.Owner {
+		cardsRemaining[ownerIdx] += 1
+	}
+
+	owner := make(map[card.Card]int)
+	status := make(map[card.Card]CardStatus)
+	for card, ownerIdx := range currentDeal.Table.Owner {
+		cardStatus := currentDeal.Table.Status[card]
+		if ownerIdx != selectedPlayerIdx || cardStatus != IN_HAND {
+			continue
+		}
+		owner[card] = ownerIdx
+		status[card] = cardStatus
+	}
+
+	table := PublicTable{
+		LeadSuit:       currentDeal.Table.LeadSuit,
+		CurrentPlayer:  currentDeal.Table.CurrentPlayer,
+		CardsRemaining: cardsRemaining,
+		Owner:          owner,
+		Status:         status,
+	}
+
+	return PublicState{
+		Dealer:  currentDeal.Dealer,
+		Bidding: currentDeal.Bidding,
+		Table:   table,
+		Pool:    pool,
+	}
 }

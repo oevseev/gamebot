@@ -12,7 +12,7 @@
             window.appConfig = {
                 webSocketUrl: {{ .webSocketUrl }},
                 gameId: {{ .gameId }},
-                playerId: window.Telegram.WebApp.initDataUnsafe.user.id
+                playerId: window.Telegram.WebApp.initDataUnsafe.user.id.toString()
             };
         </script>
         <script src="/static/bundle.js"></script>

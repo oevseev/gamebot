@@ -17,7 +17,7 @@ func NewManager(store *Store) *Manager {
 func (m *Manager) CreateLobby() (*Lobby, error) {
 	lobby := &Lobby{
 		ID:      ID(uuid.New()),
-		Members: map[int]struct{}{},
+		Members: make(map[int64]struct{}),
 		manager: m,
 	}
 	err := m.store.Insert(lobby)
