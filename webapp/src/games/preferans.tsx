@@ -43,10 +43,10 @@ function compareCards(a: CardID, b: CardID): number {
         return 1;
     }
     if (rankA < rankB) {
-        return -1;
+        return 1;
     }
     if (rankA > rankB) {
-        return 1;
+        return -1;
     }
     return 0;
 }
