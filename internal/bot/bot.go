@@ -75,19 +75,6 @@ func (b *Bot) handleCreate(update *tgbotapi.Update) {
 }
 
 func (b *Bot) Run() error {
-	_, err := b.api.Request(tgbotapi.SetChatMenuButtonConfig{
-		MenuButton: &tgbotapi.MenuButton{
-			Type: "web_app",
-			Text: "Main Menu",
-			WebApp: &tgbotapi.WebAppInfo{
-				URL: b.webappUrl,
-			},
-		},
-	})
-	if err != nil {
-		return err
-	}
-
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 	updates := b.api.GetUpdatesChan(u)
