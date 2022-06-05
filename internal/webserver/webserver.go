@@ -26,8 +26,17 @@ type WebServer struct {
 	gameServer   *GameServer
 }
 
+func ShowErrorPage(c *gin.Context) {
+	c.Next()
+
+	if len(c.Errors) > 0 {
+		c.HTML(-1, "error.tmpl", nil)
+	}
+}
+
 func NewWebServer(fqdn string, mongoClient *mongo.Client) *WebServer {
 	r := gin.Default()
+	r.Use(ShowErrorPage)
 	r.LoadHTMLGlob("templates/*.tmpl")
 
 	store := lobby.NewStore(mongoClient)
