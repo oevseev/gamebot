@@ -44,7 +44,7 @@ func (s *Store) Find(id ID) (*Lobby, error) {
 	defer cancel()
 
 	var lobby Lobby
-	err := lobbies.FindOne(ctx, bson.M{"id": lobby.ID}).Decode(&lobby)
+	err := lobbies.FindOne(ctx, bson.M{"id": id}).Decode(&lobby)
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +77,7 @@ func (s *Store) Delete(id ID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	var lobby Lobby
-	_, err := lobbies.DeleteOne(ctx, bson.M{"id": lobby.ID})
+	_, err := lobbies.DeleteOne(ctx, bson.M{"id": id})
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"encoding/hex"
 	"fmt"
 	"net/http"
 
@@ -49,12 +50,17 @@ func NewWebServer(fqdn string, mongoClient *mongo.Client) *WebServer {
 	})
 
 	r.GET("/:id", func(c *gin.Context) {
-		uuid, err := uuid.FromBytes([]byte(c.Param("id")))
+		hex, err := hex.DecodeString(c.Param("id"))
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
+			return
 		}
-		lobbyId := lobby.ID(uuid)
-		if _, err := w.lobbyManager.GetLobby(lobbyId); err != nil {
+		uuid, err := uuid.FromBytes(hex)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		if _, err := w.lobbyManager.GetLobby(lobby.ID(uuid)); err != nil {
 			c.AbortWithError(http.StatusNotFound, err)
 			return
 		}
