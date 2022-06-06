@@ -19,7 +19,16 @@ function CardDenomination({cardId}: {cardId: CardID}): JSX.Element {
     const rank = CARD_VALUES[parseInt(cardId.substring(0, index))];
     const suit = CARD_SUITS[parseInt(cardId.substring(index + 1))];
 
-    return <p><strong className="px-1">{rank}</strong><br/>{suit}</p>;
+    const redSuit = suit == "♦️" || suit == "♥️";
+    const rankClassName = `px-1 font-bold ${redSuit ? "text-red-600" : ""}`;
+
+    return (
+        <p>
+            <span className={rankClassName}>{rank}</span>
+            <br/>
+            <span>{suit}</span>
+        </p>
+    );
 }
 
 function compareCards(a: CardID, b: CardID): number {
